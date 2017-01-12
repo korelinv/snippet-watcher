@@ -2,6 +2,7 @@
 
 const gulp = require('gulp');
 const simple = require('gulp-text-simple');
+const replace = require('gulp-replace');
 const file = require('fs');
 const minimist = require('minimist');
 const colors = require('colors/safe');
@@ -158,8 +159,9 @@ function markersLocator(string, options) {
 };
 
 
+const argv = minimist(process.argv);
+
 gulp.task('scan', function() {
-    const argv = minimist(process.argv);
     let src = (!!argv.src) ? argv.src : '*.feature';
     let map = new Map();
     let markers;
@@ -173,6 +175,32 @@ gulp.task('scan', function() {
         .on('end',() => {
             log.emptyLine();
             log.result(map.toText());
+            file.appendFileSync('./log.txt', log.toString());
+        });
+});
+
+gulp.task('bump-version', function () {
+    let src = (!!argv.src) ? argv.src : '*.feature';
+    let dest = (!!argv.dest) ? argv.dest : './';
+    let tag;
+    let version;
+    if (!!argv.tag) {
+        tag = argv.tag;
+    } else {
+        throw 'tag not specified';
+    };
+    if (!!argv.version) {
+        version = argv.version;
+    } else {
+        throw 'version incriment required';
+    };
+    let log = new Log();
+    return gulp.src(src)
+        .pipe(replace(new RegExp('@@' + tag + '\\[v(\\d+)\\.(\\d+)\.(\\d+)\\]','g'), '@@' + tag + '[v' + version + ']'))
+        .pipe(gulp.dest(dest))
+        .on('end',() => {
+            log.emptyLine();
+            log.result('@@'+tag+' version bumped to ' + version);
             file.appendFileSync('./log.txt', log.toString());
         });
 });
