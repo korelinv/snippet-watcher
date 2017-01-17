@@ -10,10 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "colors": "^1.1.2",
-    "gulp": "^3.9.1",
-    "gulp-replace": "^0.5.4",
-    "gulp-text-simple": "^0.4.0",
-    "minimist": "^1.2.0",
     "q": "^1.4.1"
   }
 }
